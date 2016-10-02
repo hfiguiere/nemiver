@@ -35,10 +35,12 @@ NEMIVER_BEGIN_NAMESPACE (nemiver)
 
 struct ThreadListColumns : public Gtk::TreeModelColumnRecord {
     Gtk::TreeModelColumn<int> thread_id;
+    Gtk::TreeModelColumn<string> thread_name;
 
     ThreadListColumns ()
     {
         add (thread_id);
+        add (thread_name);
     }
 };//end class ThreadListColumns
 
@@ -109,7 +111,7 @@ struct ThreadList::Priv {
         NEMIVER_CATCH
     }
 
-    void on_debugger_threads_listed_signal (const std::list<int> &a_threads,
+    void on_debugger_threads_listed_signal (const std::list<std::pair<int, string>> &a_threads,
                                             const UString &a_cookie)
     {
         LOG_FUNCTION_SCOPE_NORMAL_DD;
@@ -183,6 +185,8 @@ struct ThreadList::Priv {
         tree_view->get_selection ()->set_mode (Gtk::SELECTION_SINGLE);
         tree_view->append_column (_("Thread ID"),
                                   thread_list_columns ().thread_id);
+        tree_view->append_column (_("Thread Name"),
+                                  thread_list_columns ().thread_name);
         Gtk::TreeViewColumn *column = tree_view->get_column (0);
         THROW_IF_FAIL (column);
         column->set_clickable (false);
@@ -215,18 +219,19 @@ struct ThreadList::Priv {
                     (sigc::mem_fun (*this, &Priv::on_draw_signal));
     }
 
-    void set_a_thread_id (int a_id)
+    void set_a_thread_id (int a_id, const string &a_name)
     {
         THROW_IF_FAIL (list_store);
         Gtk::TreeModel::iterator iter = list_store->append ();
         iter->set_value (thread_list_columns ().thread_id, a_id);
+        iter->set_value (thread_list_columns ().thread_name, a_name);
     }
 
-    void set_thread_id_list (const std::list<int> &a_list)
+    void set_thread_id_list (const std::list<std::pair<int, string>> &a_list)
     {
-        std::list<int>::const_iterator it;
+        std::list<std::pair<int, string>>::const_iterator it;
         for (it = a_list.begin (); it != a_list.end (); ++it) {
-            set_a_thread_id (*it);
+            set_a_thread_id (it->first, it->second);
         }
     }
 

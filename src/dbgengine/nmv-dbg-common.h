@@ -467,7 +467,7 @@ public:
         bool m_has_variable_value;
 
         //threads listed members
-        std::list<int> m_thread_list;
+        std::list<std::pair<int, string>> m_thread_list;
         bool m_has_thread_list;
 
         //files listed members
@@ -725,8 +725,8 @@ public:
         bool has_thread_list () const {return m_has_thread_list;}
         void has_thread_list (bool a_in) {m_has_thread_list = a_in;}
 
-        const std::list<int>& thread_list () const {return m_thread_list;}
-        void thread_list (const std::list<int> &a_in)
+        const std::list<std::pair<int, string>>& thread_list () const {return m_thread_list;}
+        void thread_list (const std::list<std::pair<int, string>> &a_in)
         {
             m_thread_list = a_in;
             has_thread_list (true);

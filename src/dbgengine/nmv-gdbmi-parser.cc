@@ -134,7 +134,7 @@ static const char* PREFIX_ERROR = "^error";
 static const char* PREFIX_BKPT = "bkpt={";
 static const char* PREFIX_BREAKPOINT_TABLE = "BreakpointTable={";
 static const char* PREFIX_BREAKPOINT_MODIFIED_ASYNC_OUTPUT = "=breakpoint-modified,";
-static const char* PREFIX_THREAD_IDS = "thread-ids={";
+static const char* PREFIX_THREADS = "threads=[";
 static const char* PREFIX_NEW_THREAD_ID = "new-thread-id=\"";
 static const char* PREFIX_FILES = "files=[";
 static const char* PREFIX_STACK = "stack=[";
@@ -1885,9 +1885,9 @@ fetch_gdbmi_result:
                 if (parse_breakpoint_table (cur, cur, breaks)) {
                     result_record.breakpoints () = breaks;
                 }
-            } else if (!m_priv->input.compare (cur, strlen (PREFIX_THREAD_IDS),
-                        PREFIX_THREAD_IDS)) {
-                std::list<int> thread_ids;
+            } else if (!m_priv->input.compare (cur, strlen (PREFIX_THREADS),
+                        PREFIX_THREADS)) {
+                std::list<std::pair<int, string>> thread_ids;
                 if (parse_threads_list (cur, cur, thread_ids)) {
                     result_record.thread_list (thread_ids);
                 }
@@ -2546,20 +2546,19 @@ GDBMIParser::parse_breakpoint_modified_async_output (UString::size_type a_from,
 bool
 GDBMIParser::parse_threads_list (UString::size_type a_from,
                                  UString::size_type &a_to,
-                                 std::list<int> &a_thread_ids)
+                                 std::list<std::pair<int, string>> &a_thread_ids)
 {
     LOG_FUNCTION_SCOPE_NORMAL_D (GDBMI_PARSING_DOMAIN);
     UString::size_type cur = a_from;
 
-    if (RAW_INPUT.compare (cur, strlen (PREFIX_THREAD_IDS),
-                           PREFIX_THREAD_IDS)) {
+    if (RAW_INPUT.compare (cur, strlen (PREFIX_THREADS),
+                           PREFIX_THREADS)) {
         LOG_PARSING_ERROR (cur);
         return false;
     }
 
     GDBMIResultSafePtr gdbmi_result;
-    std::list<int> thread_ids;
-    unsigned int num_threads = 0;
+    std::list<std::pair<int, string>> threads;
 
     // We loop, parsing GDB/MI RESULT constructs and ',' until we reach '\n'
     while (true) {
@@ -2567,55 +2566,79 @@ GDBMIParser::parse_threads_list (UString::size_type a_from,
             LOG_PARSING_ERROR (cur);
             return false;
         }
-        if (gdbmi_result->variable () == "thread-ids") {
-            // We've got a RESULT which variable is "thread-ids", we expect
-            // the value to be tuple of RESULTs of the form
-            // thread-id="<thread-id>"
+
+        if (gdbmi_result->variable () == "threads") {
+            // We've got a RESULT which variable is "threads", we expect
+            // the value to be list of RESULTs which contains tuples of 
+            // the form {
+            //              id="<thread-id>", 
+            //              target-id="<target-id>", 
+            //              name="<thread-name>", 
+            //              frame=<thread-frame>, 
+            //              state="<thread-state>", 
+            //              core="<thread-core>"
+            //          }
             THROW_IF_FAIL (gdbmi_result->value ());
             THROW_IF_FAIL ((gdbmi_result->value ()->content_type ()
-                               == GDBMIValue::TUPLE_TYPE)
+                               == GDBMIValue::LIST_TYPE)
                            ||
                            (gdbmi_result->value ()->content_type ()
                                 == GDBMIValue::EMPTY_TYPE));
 
-            GDBMITupleSafePtr gdbmi_tuple;
-            if (gdbmi_result->value ()->content_type ()
-                 != GDBMIValue::EMPTY_TYPE) {
-                gdbmi_tuple = gdbmi_result->value ()->get_tuple_content ();
-                THROW_IF_FAIL (gdbmi_tuple);
+            GDBMIListSafePtr gdbmi_list;
+            if (gdbmi_result->value ()->content_type () != GDBMIValue::EMPTY_TYPE) {
+                gdbmi_list = gdbmi_result->value ()->get_list_content ();
+                THROW_IF_FAIL (gdbmi_list);
             }
 
-            list<GDBMIResultSafePtr> result_list;
-            if (gdbmi_tuple) {
-                result_list = gdbmi_tuple->content ();
-            }
-            list<GDBMIResultSafePtr>::const_iterator it;
-            int thread_id=0;
-            for (it = result_list.begin (); it != result_list.end (); ++it) {
-                THROW_IF_FAIL (*it);
-                if ((*it)->variable () != "thread-id") {
-                    LOG_ERROR ("expected a gdbmi value with "
-                               "variable name 'thread-id'. "
-                               "Got '" << (*it)->variable () << "'");
-                    return false;
+            if (gdbmi_list && !(gdbmi_list->empty ())) {
+                list<GDBMIValueSafePtr> value_list;
+                gdbmi_list->get_value_content (value_list);
+
+                list<GDBMIValueSafePtr>::const_iterator value_iter;
+                for (value_iter = value_list.begin (); 
+                     value_iter != value_list.end (); 
+                     ++value_iter) {
+                    THROW_IF_FAIL (*value_iter);
+                    THROW_IF_FAIL ((*value_iter)->content_type () == GDBMIValue::TUPLE_TYPE);
+                    GDBMITupleSafePtr gdbmi_tuple = (*value_iter)->get_tuple_content ();
+                    list<GDBMIResultSafePtr> result_list = gdbmi_tuple->content ();
+
+                    int thread_id = 0;
+                    string thread_name;
+                    list<GDBMIResultSafePtr>::const_iterator it;
+                    for (it = result_list.begin (); it != result_list.end (); ++it) {
+
+                        if ((*it)->variable () == "id") {
+                            THROW_IF_FAIL ((*it)->value ()
+                                           && ((*it)->value ()->content_type ()
+                                           == GDBMIValue::STRING_TYPE));
+                            thread_id = atoi ((*it)->value ()->get_string_content ().c_str ());
+                        } else if((*it)->variable () == "target-id") {
+                            // We don't use the target-id field for now
+                        }  else if((*it)->variable () == "name") {
+                            THROW_IF_FAIL ((*it)->value ()
+                                           && ((*it)->value ()->content_type ()
+                                           == GDBMIValue::STRING_TYPE));
+                            thread_name = (*it)->value ()->get_string_content ();
+                        } else if((*it)->variable () == "frame") {
+                            // We don't use the frame field here because
+                            // this information is retrived from another command
+                        } else if((*it)->variable () == "state") {
+                            // We don't use the state field for now
+                        } else if((*it)->variable () == "core") {
+                            // We don't use the core field for now
+                        } else {
+                            LOG_ERROR ("Got an unknown gbmi value which variable is '"
+                                       << gdbmi_result->variable ()
+                                       << "'. Ignoring it thus.");
+                            return false;
+                        }
+                    }
+                    THROW_IF_FAIL (thread_id);
+                    threads.push_back (make_pair(thread_id, thread_name));
                 }
-                THROW_IF_FAIL ((*it)->value ()
-                               && ((*it)->value ()->content_type ()
-                                   == GDBMIValue::STRING_TYPE));
-                thread_id = atoi ((*it)->value ()->get_string_content ()
-                                  .c_str ());
-                THROW_IF_FAIL (thread_id);
-                thread_ids.push_back (thread_id);
             }
-        } else if (gdbmi_result->variable () == "number-of-threads") {
-            // We've got a RESULT which variable is "number-of-threads",
-            // we expect the result to be a string which is the number 
-            // of threads.
-            THROW_IF_FAIL (gdbmi_result->value ()
-                           && gdbmi_result->value ()->content_type ()
-                           == GDBMIValue::STRING_TYPE);
-            num_threads =
-                atoi (gdbmi_result->value ()->get_string_content ().c_str ());
         } else if (gdbmi_result->variable () == "current-thread-id") {
             // If we've got a RESULT which variable is
             // "current-thread-id", expect the result to be a string
@@ -2644,16 +2667,7 @@ GDBMIParser::parse_threads_list (UString::size_type a_from,
         SKIP_BLANK (cur);
     }
 
-    if (num_threads != thread_ids.size ()) {
-        LOG_ERROR ("num_threads: '"
-                   << (int) num_threads
-                   << "', thread_ids.size(): '"
-                   << (int) thread_ids.size ()
-                   << "'");
-        return false;
-    }
-
-    a_thread_ids = thread_ids;
+    a_thread_ids = threads;
     a_to = cur;
     return true;
 }

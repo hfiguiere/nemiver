@@ -977,9 +977,13 @@ msgstr "Appel système vfork"
 msgid "Exec System Call"
 msgstr "Appel système exec"
 
-#: ../src/persp/dbgperspective/nmv-thread-list.cc:184
+#: ../src/persp/dbgperspective/nmv-thread-list.cc:186
 msgid "Thread ID"
 msgstr "ID thread"
+
+#: ../src/persp/dbgperspective/nmv-thread-list.cc:188
+msgid "Thread Name"
+msgstr "Nom thread"
 
 #. create the columns of the tree view
 #: ../src/persp/dbgperspective/nmv-vars-treeview.cc:50

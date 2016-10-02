@@ -544,7 +544,7 @@ public:
     /// "-thread-list-ids".
     bool parse_threads_list (UString::size_type a_from,
                              UString::size_type &a_to,
-                             std::list<int> &a_thread_ids);
+                             std::list<std::pair<int, string>> &a_thread_ids);
 
     /// parses the result of the gdbmi command
     /// "-thread-select"

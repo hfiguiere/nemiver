@@ -31,6 +31,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <utility>
 #include "common/nmv-api-macros.h"
 #include "common/nmv-ustring.h"
 #include "common/nmv-dynamic-module.h"
@@ -59,6 +60,7 @@ using std::vector;
 using std::string;
 using std::map;
 using std::list;
+using std::pair;
 
 NEMIVER_BEGIN_NAMESPACE (nemiver)
 
@@ -1162,7 +1164,7 @@ public:
                          const UString& /*cookie*/>& stopped_signal () const=0;
 
     virtual sigc::signal<void,
-                         const list<int>/*thread ids*/,
+                         const list<pair<int, string>>/*thread ids and names*/,
                          const UString& /*cookie*/>&
                                         threads_listed_signal () const =0;
 

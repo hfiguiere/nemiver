@@ -33,6 +33,7 @@
 #include <memory>
 #include <fstream>
 #include <iostream>
+#include <utility>
 #include "nmv-i-debugger.h"
 #include "common/nmv-env.h"
 #include "common/nmv-exception.h"
@@ -293,7 +294,7 @@ public:
                          int, const string&, const UString&> stopped_signal;
 
     mutable sigc::signal<void,
-                         const list<int>,
+                         const list<pair<int, string>>,
                          const UString& > threads_listed_signal;
 
     mutable sigc::signal<void,
@@ -3786,7 +3787,7 @@ GDBEngine::stopped_signal () const
     return m_priv->stopped_signal;
 }
 
-sigc::signal<void, const list<int>, const UString& >&
+sigc::signal<void, const list<pair<int, string>>, const UString& >&
 GDBEngine::threads_listed_signal () const
 {
     return m_priv->threads_listed_signal;
@@ -5198,7 +5199,7 @@ GDBEngine::list_threads (const UString &a_cookie)
 {
     LOG_FUNCTION_SCOPE_NORMAL_DD;
 
-    queue_command (Command ("list-threads", "-thread-list-ids", a_cookie));
+    queue_command (Command ("list-threads", "-thread-info", a_cookie));
 }
 
 void

@@ -103,7 +103,7 @@ public:
                 const UString& /*cookie*/>& stopped_signal () const;
 
     sigc::signal<void,
-                 const list<int>,
+                 const list<pair<int, string>>,
                  const UString& >& threads_listed_signal () const;
 
     sigc::signal<void, const vector<UString>&, const UString& >&
