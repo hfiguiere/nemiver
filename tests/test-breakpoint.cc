@@ -160,16 +160,15 @@ on_variable_type_signal (const UString &a_variable_name,
 }
 
 void
-on_threads_listed_signal (const std::list<int> &a_thread_ids,
+on_threads_listed_signal (const std::list<pair<int, string>> &a_thread_ids,
                           const UString &a_cookie)
 {
 
     if (a_cookie.empty ()) {}
 
     MESSAGE ("number of threads: '" << (int)a_thread_ids.size ());
-    std::list<int>::const_iterator it;
-    for (it = a_thread_ids.begin (); it != a_thread_ids.end () ; ++it) {
-        MESSAGE ("thread-id: '" << *it);
+    for (auto it = a_thread_ids.cbegin (); it != a_thread_ids.cend () ; ++it) {
+        MESSAGE ("thread-id: '" << it->first);
     }
 }
 
