@@ -328,6 +328,9 @@ public:
                 case IDebugger::SIGNAL_RECEIVED:
                     return "signal-received";
                     break;
+                default:
+                    LOG_ERROR ("Invalid reason");
+                    break;
             }
             return result;
         }

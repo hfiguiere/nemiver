@@ -168,6 +168,9 @@ location_to_string (const Loc &a_loc,
         location_to_string (loc, a_str);
     }
         break;
+    default:
+        LOG_ERROR ("Invalid location kind");
+        break;
     }
 }
 

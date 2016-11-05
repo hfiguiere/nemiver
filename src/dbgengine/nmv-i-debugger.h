@@ -1060,6 +1060,9 @@ public:
         case PROGRAM_EXITED:
             str = "PROGRAM_EXITED";
             break;
+        default:
+            LOG_ERROR ("Unknown state" << static_cast<int> (a_state));
+            break;
         }
         return str;
     }

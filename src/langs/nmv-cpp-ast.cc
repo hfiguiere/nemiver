@@ -22,6 +22,7 @@
  *
  *See COPYRIGHT file copyright information.
  */
+#include "common/nmv-log-stream-utils.h"
 #include "nmv-cpp-ast.h"
 
 NEMIVER_BEGIN_NAMESPACE (nemiver)
@@ -304,6 +305,8 @@ ExprBase::operator_to_string (Operator a_op)
             return OP_XOR_EQ;
         case OR_EQ:
             return OP_OR_EQ;
+        default:
+            LOG_ERROR ("Invalid op");
     }
     return OP_UNDEFINED;
 }

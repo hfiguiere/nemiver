@@ -189,6 +189,9 @@ variable_format_to_string (IDebugger::Variable::Format a_format)
     case IDebugger::Variable::UNKNOWN_FORMAT:
         result = "unknown";
         break;
+    default:
+        LOG_ERROR ("Invalid format");
+        break;
     }
     return result;
 }

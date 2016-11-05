@@ -1768,6 +1768,9 @@ DBGPerspective::on_breakpoint_go_to_source_action
                 break;
             case SourceEditor::BUFFER_TYPE_UNDEFINED:
                 break;
+            default:
+                LOG_ERROR ("Invalid source editor buffer type");
+                break;
         }
     }
 
@@ -1878,6 +1881,9 @@ DBGPerspective::on_sv_markers_region_clicked_signal (int a_line,
             }
                 break;
             case SourceEditor::BUFFER_TYPE_UNDEFINED:
+                break;
+            default:
+                LOG_ERROR ("Invalid editor buffer type");
                 break;
         }
     }
@@ -4443,6 +4449,9 @@ DBGPerspective::set_where (const IDebugger::Frame &a_frame,
                               a_do_scroll, a_try_hard);
         case SourceEditor::BUFFER_TYPE_UNDEFINED:
             break;
+        default:
+            LOG_ERROR ("Invalid editor buffer type");
+            break;
     }
     return false;
 }
@@ -6795,6 +6804,9 @@ DBGPerspective::do_jump_and_break_to_location (const Loc &a_location)
                 JUMP_TO_LOC_AFTER_ENABLE_BP (loc);
             }
                 break;
+            default:
+                LOG_ERROR ("Invalid breakpoint location kind");
+                break;
             }
         }
     } else {
@@ -6819,6 +6831,8 @@ DBGPerspective::do_jump_and_break_to_location (const Loc &a_location)
                 (static_cast<const AddressLoc &> (a_location));
             JUMP_TO_LOC_AFTER_SET_BP (loc);
         }
+        default:
+            LOG_ERROR ("Invalid breakpoint location kind");
             break;
         }
     }
@@ -7050,6 +7064,9 @@ DBGPerspective::append_breakpoint (const IDebugger::Breakpoint &a_breakpoint)
                 break;
             case SourceEditor::BUFFER_TYPE_UNDEFINED:
                 break;
+            default:
+                LOG_ERROR ("Invalid editor buffer type");
+                break;
         }
     } else if (!a_breakpoint.has_multiple_locations ()) {
         // We not could find an editor for the file of the breakpoint.
@@ -7123,6 +7140,9 @@ DBGPerspective::get_breakpoint (const Loc &a_location) const
             static_cast<const AddressLoc&> (a_location);
         return get_breakpoint (loc.address ());
     }
+    default:
+        LOG_ERROR ("Invalid breakpoint location kind");
+        break;
     }
     // Should not be reached.
     return 0;
@@ -7307,6 +7327,9 @@ DBGPerspective::delete_visual_breakpoint (map<string, IDebugger::Breakpoint>::it
     case SourceEditor::BUFFER_TYPE_UNDEFINED:
         THROW ("should not be reached");
         break;
+    default:
+        THROW ("should not be reached - invalid type");
+        break;
     }
 
     LOG_DD ("going to erase breakpoint number " << a_i->first);
@@ -7393,6 +7416,9 @@ DBGPerspective::apply_decorations (SourceEditor *a_editor,
                                                a_scroll_to_where_marker);
             break;
         case SourceEditor::BUFFER_TYPE_UNDEFINED:
+            break;
+        default:
+            LOG_ERROR ("Invalid buffer type");
             break;
     }
     return result;
@@ -7559,6 +7585,9 @@ DBGPerspective::is_breakpoint_set_at_location (const Loc &a_location,
         return is_breakpoint_set_at_address (loc.address (),
                                              a_enabled);
     }
+        break;
+    default:
+        LOG_ERROR ("Invalid breakpoint location type");
         break;
     }
     // Should not be reached

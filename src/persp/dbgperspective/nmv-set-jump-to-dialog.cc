@@ -169,6 +169,9 @@ public:
         case MODE_BINARY_LOCATION:
             radio_binary_location->set_active ();
             break;
+        default:
+            LOG_ERROR ("Invalid location setting mode");
+            break;
         }
     }
 
@@ -205,6 +208,9 @@ public:
             AddressLoc *loc = new AddressLoc (a);
             return loc;
         }
+        default:
+            LOG_ERROR ("Invalid location");
+            break;
         } // end case
 
         return 0;
@@ -241,6 +247,9 @@ public:
             o << loc.address ();
             entry_address->set_text (o.str ());
         }
+            break;
+        default:
+            LOG_ERROR ("Invalid location type");
             break;
         }
     }

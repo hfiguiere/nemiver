@@ -320,6 +320,10 @@ gdbmi_list_to_string (GDBMIListSafePtr a_list,
         case GDBMIList::UNDEFINED_TYPE:
             a_string += "<undefined-gdbmi-list-type>";
             break;
+        default:
+            LOG_ERROR ("Invalid gdmi list type");
+            a_string += "<undefined-gdbmi-list-type>";
+            break;
     }
     a_string += "]";
     return is_ok;
@@ -349,6 +353,9 @@ gdbmi_value_to_string (GDBMIValueSafePtr a_value,
             result = gdbmi_tuple_to_string (a_value->get_tuple_content (),
                                             a_string);
             break;
+        default:
+            LOG_ERROR ("Invalid content_type");
+            result = false;
     }
     return result;
 }

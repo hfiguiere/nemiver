@@ -305,6 +305,8 @@ struct SourceEditor::Priv {
                 return &asm_ctxt.markers;
             case SourceEditor::BUFFER_TYPE_UNDEFINED:
                 return 0;
+            default:
+                LOG_ERROR ("Invalid buffer type.");
         }
         return 0;
     }
@@ -881,6 +883,8 @@ SourceEditor::current_location () const
 	  return new AddressLoc (a);
     }
       break;
+    default:
+        LOG_ERROR ("Invalid buffer type");
     }
 
     return 0;

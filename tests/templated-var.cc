@@ -44,6 +44,9 @@ operator<< (std::ostream &a_out, const plot<int, int> &a_plot)
         case plot<int, int>::BAR :
             a_out << "plot::BAR";
             break;
+        default:
+            a_out << "undefined";
+            break;
     }
     return a_out;
 }
