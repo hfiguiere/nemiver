@@ -62,8 +62,6 @@ NEMIVER_API const UString& get_system_modules_config_file ();
 
 NEMIVER_API const UString& get_system_modules_dir ();
 
-NEMIVER_API const UString& get_system_modules_config_file ();
-
 NEMIVER_API const UString& get_system_plugins_dir ();
 
 NEMIVER_API const UString& get_user_db_dir ();

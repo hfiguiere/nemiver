@@ -296,9 +296,6 @@ ostream& operator<< (ostream &a_out, const GDBMITupleSafePtr &a_tuple);
 ostream&
 operator<< (ostream &a_out, const GDBMIListSafePtr a_list);
 
-ostream&
-operator<< (ostream &a_out, const GDBMIValueSafePtr &a_val);
-
 std::ostream&
 operator<< (std::ostream &a_out, const IDebugger::Variable &a_var);
 
