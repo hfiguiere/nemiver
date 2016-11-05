@@ -38,8 +38,8 @@
 #ifndef NMV_DEFAULT_DOMAIN
 #define NMV_DEFAULT_DOMAIN __extension__        \
     ({                                          \
-        const char* path = __FILE__;            \
-        Glib::path_get_basename (path);         \
+        const char* s_f_path = __FILE__;        \
+        Glib::path_get_basename (s_f_path);     \
     })
 #endif
 

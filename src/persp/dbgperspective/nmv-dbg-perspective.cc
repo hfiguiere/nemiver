@@ -1948,10 +1948,10 @@ DBGPerspective::on_motion_notify_event_signal (GdkEventMotion *a_event)
     if (m_priv->popup_tip
         && m_priv->popup_tip->get_display ()) {
             // Mouse pointer coordinates relative to the root window
-            int x = 0, y = 0;
+            int x2 = 0, y2 = 0;
             m_priv->popup_tip->get_display ()->get_device_manager
-                ()->get_client_pointer ()->get_position (x, y);
-            hide_popup_tip_if_mouse_is_outside (x, y);
+                ()->get_client_pointer ()->get_position (x2, y2);
+            hide_popup_tip_if_mouse_is_outside (x2, y2);
     }
 
     NEMIVER_CATCH;
@@ -5373,7 +5373,6 @@ DBGPerspective::create_source_editor (Glib::RefPtr<Gsv::Buffer> &a_source_buf,
     NEMIVER_TRY
 
     SourceEditor *source_editor;
-    Gtk::TextIter cur_line_iter;
     int current_line =  -1;
 
     if (a_asm_view) {
@@ -7008,11 +7007,11 @@ DBGPerspective::append_breakpoint (const IDebugger::Breakpoint &a_breakpoint)
 
     UString file_path;
     file_path = a_breakpoint.file_full_name ();
-    IDebugger::Breakpoint::Type type = a_breakpoint.type ();
+    IDebugger::Breakpoint::Type bp_type = a_breakpoint.type ();
     SourceEditor *editor = 0;
 
-    if ((type == IDebugger::Breakpoint::STANDARD_BREAKPOINT_TYPE
-         || type == IDebugger::Breakpoint::COUNTPOINT_TYPE)
+    if ((bp_type == IDebugger::Breakpoint::STANDARD_BREAKPOINT_TYPE
+         || bp_type == IDebugger::Breakpoint::COUNTPOINT_TYPE)
         && file_path.empty ()) {
         file_path = a_breakpoint.file_name ();
     }
@@ -7023,8 +7022,8 @@ DBGPerspective::append_breakpoint (const IDebugger::Breakpoint &a_breakpoint)
     if (// We don't know how to graphically represent non-standard
         // breakpoints (e.g watchpoints) at this moment, so let's not
         // bother trying to graphically represent them.
-        (type != IDebugger::Breakpoint::STANDARD_BREAKPOINT_TYPE
-         && type != IDebugger::Breakpoint::COUNTPOINT_TYPE)
+        (bp_type != IDebugger::Breakpoint::STANDARD_BREAKPOINT_TYPE
+         && bp_type != IDebugger::Breakpoint::COUNTPOINT_TYPE)
         // Let's not bother trying to to graphically represent a
         // pending breakpoint, either.
         || a_breakpoint.is_pending ())

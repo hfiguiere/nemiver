@@ -63,7 +63,7 @@ class ExprInspector::Priv : public sigc::trackable {
     IDebugger &debugger;
     // Variable that is being inspected
     // at a given point in time
-    IDebugger::VariableSafePtr variable;
+    IDebugger::VariableSafePtr variable_;
     IPerspective &perspective;
     VarsTreeView *tree_view;
     Glib::RefPtr<Gtk::TreeStore> tree_store;
@@ -192,7 +192,7 @@ class ExprInspector::Priv : public sigc::trackable {
             && (a_variable->members ().size ()
                 || a_variable->needs_unfolding ()))
             tree_view->expand_row (tree_store->get_path (var_row), false);
-        variable = a_variable;
+        variable_ = a_variable;
     }
 
     void
@@ -207,7 +207,7 @@ class ExprInspector::Priv : public sigc::trackable {
         re_visualize = a_re_visualize;
 
         re_init_tree_view ();
-        variable = a_variable;
+        variable_ = a_variable;
         if (a_re_visualize) {
             debugger.revisualize_variable (a_variable,
                                            sigc::bind
@@ -427,17 +427,17 @@ class ExprInspector::Priv : public sigc::trackable {
         if (!var)
             return;
 
-        variable = var;
+        variable_ = var;
 
         // If the variable should be editable, set the cell of the variable value
         // editable.
         cur_selected_row->set_value
                     (vutil::get_variable_columns ().variable_value_editable,
-                     debugger.is_variable_editable (variable));
+                     debugger.is_variable_editable (variable_));
 
         // Dump some log about the variable that got selected.
         UString qname;
-        variable->build_qname (qname);
+        variable_->build_qname (qname);
         LOG_DD ("row of variable '" << qname << "'");
 
         NEMIVER_CATCH
@@ -742,7 +742,7 @@ ExprInspector::get_expression () const
 {
     THROW_IF_FAIL (m_priv);
 
-    return m_priv->variable;
+    return m_priv->variable_;
 }
 
 void

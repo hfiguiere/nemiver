@@ -1946,8 +1946,8 @@ Parser::parse_declarator_id (IDDeclaratorPtr &a_result)
     }
     parse_nested_name_specifier (scope);
     if (parse_type_name (type_name)) {
-        IDExprPtr id_expr (new QualifiedIDExpr (scope, type_name));
-        result.reset (new IDDeclarator (id_expr));
+        IDExprPtr qualified_id_expr (new QualifiedIDExpr (scope, type_name));
+        result.reset (new IDDeclarator (qualified_id_expr));
         goto okay;
     }
 

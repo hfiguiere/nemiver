@@ -2086,12 +2086,12 @@ fetch_gdbmi_result:
                                            PREFIX_VARIABLE_FORMAT)) {
                 IDebugger::Variable::Format format =
                             IDebugger::Variable::UNDEFINED_FORMAT;
-                UString value;
-                if (parse_variable_format (cur, cur, format, value)) {
+                UString fmt_value;
+                if (parse_variable_format (cur, cur, format, fmt_value)) {
                     result_record.variable_format (format);
-                    if (!value.empty ()) {
+                    if (!fmt_value.empty ()) {
                         IDebugger::VariableSafePtr var (new IDebugger::Variable);
-                        var->value (value);
+                        var->value (fmt_value);
                         result_record.variable_value (var);
                     }
                 } else {
@@ -3553,8 +3553,8 @@ GDBMIParser::parse_var_list_children
                    "the GDBMI variable " << NUMCHILD);
         return false;
     }
-    UString s = result->value ()->get_string_content ();
-    unsigned num_children = s.empty () ? 0 : atoi (s.c_str ());
+    UString num_s = result->value ()->get_string_content ();
+    unsigned num_children = num_s.empty () ? 0 : atoi (num_s.c_str ());
 
     if (!num_children) {
         LOG_D ("Variable has zero children",

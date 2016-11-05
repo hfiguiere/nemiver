@@ -82,11 +82,11 @@ parse_string_colon_number (const std::string &a_str,
     if (is_number && number_is_at_end_of_str) {
         string file_name, line_num;
 
-        for (string::size_type i = 0; i < str_len; ++i)
-            a_resulting_string.push_back (a_str[i]);
+        for (string::size_type j = 0; j < str_len; ++j)
+            a_resulting_string.push_back (a_str[j]);
 
-        for (string::size_type i = colon_pos + 1; i < a_str.length (); ++i)
-            a_number.push_back (a_str[i]);
+        for (string::size_type j = colon_pos + 1; j < a_str.length (); ++j)
+            a_number.push_back (a_str[j]);
         result = true;
     } else {
         // Bail out because the ':' is either not a legit number or

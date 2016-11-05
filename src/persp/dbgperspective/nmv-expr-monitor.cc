@@ -59,7 +59,7 @@ struct ExprMonitor::Priv
     IDebugger::VariableList killed_expressions;
     map<IDebugger::VariableSafePtr, bool> in_scope_exprs;
     map<IDebugger::VariableSafePtr, bool> revived_exprs;
-    vector<Gtk::TreeModel::Path> selected_paths;
+    vector<Gtk::TreeModel::Path> selected_paths_;
     Glib::RefPtr<Gtk::ActionGroup> action_group;
     Gtk::Widget *contextual_menu;
     IDebugger::Frame saved_frame;
@@ -1223,7 +1223,7 @@ struct ExprMonitor::Priv
         Glib::RefPtr<Gtk::TreeSelection> selection = tree_view->get_selection ();
         THROW_IF_FAIL (selection);
 
-        selected_paths =
+        selected_paths_ =
             selection->get_selected_rows ();
 
         NEMIVER_CATCH;

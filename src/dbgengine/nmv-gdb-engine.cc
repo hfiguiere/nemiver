@@ -884,21 +884,21 @@ public:
     {
         LOG_FUNCTION_SCOPE_NORMAL_DD;
 
-        vector<UString> argv;
+        vector<UString> core_argv;
 
         // if the executable program to be debugged is a libtool wrapper script,
         // run the debugging session under libtool
         if (is_libtool_executable_wrapper (a_prog_path)) {
             LOG_DD (a_prog_path << " is a libtool wrapper.  ");
-            argv.push_back ("libtool");
-            argv.push_back ("--mode=execute");
+            core_argv.push_back ("libtool");
+            core_argv.push_back ("--mode=execute");
         }
 
-        argv.push_back (env::get_gdb_program ());
-        argv.push_back ("--interpreter=mi2");
-        argv.push_back (a_prog_path);
-        argv.push_back (a_core_path);
-        return launch_gdb_real (argv);
+        core_argv.push_back (env::get_gdb_program ());
+        core_argv.push_back ("--interpreter=mi2");
+        core_argv.push_back (a_prog_path);
+        core_argv.push_back (a_core_path);
+        return launch_gdb_real (core_argv);
     }
 
     bool issue_command (const Command &a_command,

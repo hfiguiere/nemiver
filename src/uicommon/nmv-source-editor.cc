@@ -178,7 +178,7 @@ struct SourceEditor::Priv {
     Gtk::Label *line_col_label;
     Gtk::Box *status_box;
     enum SourceEditor::BufferType buffer_type;
-    UString path;
+    UString path_;
 
     struct NonAssemblyBufContext {
         Glib::RefPtr<Buffer> buffer;
@@ -905,7 +905,7 @@ SourceEditor::move_where_marker_to_line (int a_line, bool a_do_scroll)
     Glib::RefPtr<Gtk::TextMark> where_marker =
         source_view ().get_source_buffer ()->get_mark (WHERE_MARK);
     if (!where_marker) {
-        Glib::RefPtr<Gtk::TextMark> where_marker =
+        where_marker =
             source_view ().get_source_buffer ()->create_source_mark
                                                         (WHERE_MARK,
                                                          WHERE_CATEGORY,
@@ -1028,8 +1028,6 @@ SourceEditor::clear_decorations ()
     typedef std::map<int, Glib::RefPtr<Gsv::Mark> >::iterator
       SourceMarkMapIter;
 
-    SourceMarkMapIter it;
-
     std::list<SourceMarkMapIter> marks_to_erase;
 
     // Clear breakpoint markers and erase them from the hash map that
@@ -1123,19 +1121,19 @@ SourceEditor::scroll_to_iter (Gtk::TextIter &a_iter)
 void
 SourceEditor::set_path (const UString &a_path)
 {
-    m_priv->path = a_path;
+    m_priv->path_ = a_path;
 }
 
 void
 SourceEditor::get_path (UString &a_path) const
 {
-    a_path = m_priv->path;
+    a_path = m_priv->path_;
 }
 
 const UString&
 SourceEditor::get_path () const
 {
-    return m_priv->path;
+    return m_priv->path_;
 }
 
 void
